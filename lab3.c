@@ -1,91 +1,93 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-// Define constants for number of constraints and number of variables
-#define NUM_CONSTRAINTS 3 // Example value
-#define NUM_VARIABLES 3   // Example value
+#define MAX_ROWS 100
+#define MAX_COLS 100
 
-// Simplex tableau
-double tableau[NUM_CONSTRAINTS + 1][NUM_VARIABLES + NUM_CONSTRAINTS + 1];
-
-// Initialize the tableau
-void setupSimplexTable(double z[], double constraints[][NUM_VARIABLES], double b[])
-{
-    int i, j;
-
-    // Set up the objective function
-    for (j = 0; j < NUM_VARIABLES; ++j)
-    {
-        tableau[0][j] = -z[j];
-    }
-
-    // Set up the constraints
-    for (i = 0; i < NUM_CONSTRAINTS; ++i)
-    {
-        for (j = 0; j < NUM_VARIABLES; ++j)
-        {
-            tableau[i + 1][j] = constraints[i][j];
-        }
-    }
-
-    // Set up the b values (right-hand side of constraints)
-    for (i = 0; i < NUM_CONSTRAINTS; ++i)
-    {
-        tableau[i + 1][NUM_VARIABLES + NUM_CONSTRAINTS] = b[i];
-    }
-
-    // Set the identity matrix for slack variables
-    for (i = 0; i < NUM_CONSTRAINTS; ++i)
-    {
-        tableau[i + 1][NUM_VARIABLES + i] = 1.0;
-    }
-}
-
-// Main Simplex method function
-void simplex()
-{
-
-    // TODO: Implement Simplex algorithm iterations
-    // This includes finding the pivot column, pivot row, performing the pivot operation
-    // and repeating until the solution is found or infeasibility is detected.
-}
-
-// Function to print the current tableau
-void printTableau()
-{
-    int i, j;
-    for (i = 0; i < NUM_CONSTRAINTS + 1; ++i)
-    {
-        for (j = 0; j < NUM_VARIABLES + NUM_CONSTRAINTS + 1; ++j)
-        {
-            printf("%lf \t", tableau[i][j]);
+void printTbl(float tableau[MAX_ROWS][MAX_COLS], int m, int n) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%.2f\t", tableau[i][j]);
         }
         printf("\n");
     }
 }
 
-int main()
-{
-    // Example z=cx equation coefficients
-    double z[NUM_VARIABLES] = {1, 2, 3};
+void initTbl(float tableau[MAX_ROWS][MAX_COLS], int m, int n) {
+    // Initialize the tableau with coefficients of the objective function and constraints
+    // Replace this with your problem coefficients
+    float c[MAX_COLS] = {3, 2};  // Objective function coefficients
+    float A[MAX_ROWS][MAX_COLS] = {
+        {2, 3},
+        {1, 2}
+    };  // Constraint coefficients
+    float b[MAX_ROWS] = {6, 4};  // Right-hand side values
+    
+    // Copy the objective function coefficients to the tableau
+    for (int j = 0; j < n; j++) {
+        tableau[0][j] = c[j];
+    }
+    
+    // Copy the constraint coefficients and right-hand side values to the tableau
+    for (int i = 1; i <= m; i++) {
+        for (int j = 0; j < n; j++) {
+            tableau[i][j] = A[i-1][j];
+        }
+        tableau[i][n] = b[i-1];
+    }
+}
 
-    // Example constraint coefficients Ax:
-    double constraints[NUM_CONSTRAINTS][NUM_VARIABLES] = {
-        {1, -2, 3},
-        {-1, 1, 2},
-        {2, -1, -1}};
+void basicAndFreeUnknowns(float tableau[MAX_ROWS][MAX_COLS], int m, int n) {
+    // Identify basic and free unknowns
+    int mU[MAX_COLS] = {0};  // Array to store whether a variable is a main unknown (1) or not (0)
+    
+    // Check each column to see if it forms part of the identity matrix in the tableau
+    for (int j = 0; j < n; j++) {
+        int cnt1 = 0;  // Count of ones in the column
+        int rInd = -1;  // Index of the row with the one
+        
+        // Iterate over each row in the column
+        for (int i = 1; i <= m; i++) {
+            if (tableau[i][j] == 1) {
+                cnt1++;
+                rInd = i;
+            } else if (tableau[i][j] != 0) {
+                cnt1 = 0;  // Reset count if non-zero value found
+                break;
+            }
+        }
+        
+        // If exactly one one found in the column, mark the corresponding variable as a main unknown
+        if (cnt1 == 1) {
+            mU[j] = 1;
+            printf("Variable x%d is a main unknown.\n", j + 1);
+        }
+    }
+    
+    // Identify free unknowns based on variables that are not main unknowns
+    printf("Free unknowns: ");
+    for (int j = 0; j < n; j++) {
+        if (!mU[j]) {
+            printf("x%d ", j + 1);
+        }
+    }
+    printf("\n");
+}
 
-    // Example b values (right-hand side values)
-    double b[NUM_CONSTRAINTS] = {9, 26, 42};
-
-    // Setup the simplex table with the problem data
-    setupSimplexTable(z, constraints, b);
-
-    // Print the initial tableau for verification
-    printTableau();
-
-    // TODO: Call the Simplex method function to solve the problem
-    // simplex();
-
+int main() {
+    int m = 2;  // Number of constraints
+    int n = 2;  // Number of decision variables
+    
+    float tableau[MAX_ROWS][MAX_COLS];
+    
+    // Initialize the tableau
+    initTbl(tableau, m, n);
+    
+    // Print the initial tableau
+    printf("Initial simplex tableau:\n");
+    printTbl(tableau, m + 1, n + 1);
+    
+    // Identify main and free unknowns
+    basicAndFreeUnknowns(tableau, m, n);
+    
     return 0;
 }
