@@ -3,12 +3,6 @@
 
 #define MAX_ITERATIONS 100
 
-// Auxiliary functions to implement for operating on matrices:
-// - pivot_on(tableau, row, col)
-// - add_rows(tableau, dest_row, src_row, scalar)
-// - negate_row(tableau, row)
-// - print_tableau(tableau, rows, cols), etc.
-
 void simplex(double **tableau, int rows, int cols) {
     while (1) {
         int pivot_col = 0, pivot_row = 0;

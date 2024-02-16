@@ -7,7 +7,6 @@
 void northWestCorner(int supply[], int demand[], int cost[M][N], int allocation[M][N]) {
     int i = 0, j = 0;
 
-    // Initialize the allocation array
     for (int u = 0; u < M; u++) {
         for (int v = 0; v < N; v++) {
             allocation[u][v] = 0;
@@ -16,13 +15,11 @@ void northWestCorner(int supply[], int demand[], int cost[M][N], int allocation[
 
     while (i < M && j < N) {
         if (supply[i] < demand[j]) {
-            // supply less than demand
             allocation[i][j] = supply[i];
             demand[j] -= supply[i];
             supply[i] = 0;
             i++;
         } else {
-            // demand  less than or equal to supply
             allocation[i][j] = demand[j];
             supply[i] -= demand[j];
             demand[j] = 0;

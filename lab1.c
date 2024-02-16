@@ -7,7 +7,7 @@
 void J1sttran(double a[][M], int r, int c) {
     double id[M][M] = {0};
 
-    // Init unit a (identity a)
+    // Init unit mat (identity mat)
     for (int i = 0; i < r; i++) {
         id[i][i] = 1;
     }
